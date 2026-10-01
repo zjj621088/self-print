@@ -6,7 +6,7 @@ import { PrismaService } from "../prisma.service";
 import type { ClaimJobDto, FailJobDto, HeartbeatDto } from "./dto";
 
 const jobInclude = {
-  order: { select: { orderNo: true, remark: true } },
+  order: { select: { orderNo: true, pickupCode: true, remark: true } },
   orderItem: {
     select: {
       copies: true,
@@ -149,7 +149,7 @@ function presentJob(job: {
   status: string;
   copies: number;
   error: string;
-  order: { orderNo: string; remark: string };
+  order: { orderNo: string; pickupCode: string | null; remark: string };
   printer: { id: string; name: string; systemName: string } | null;
   orderItem: {
     colorMode: string;
@@ -166,6 +166,7 @@ function presentJob(job: {
     copies: job.copies,
     error: job.error,
     orderNo: job.order.orderNo,
+    pickupCode: job.order.pickupCode,
     remark: job.order.remark,
     colorMode: job.orderItem.colorMode,
     duplex: job.orderItem.duplex,

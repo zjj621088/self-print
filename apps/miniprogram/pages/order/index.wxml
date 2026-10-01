@@ -1,10 +1,15 @@
 <view class="page">
   <view wx:if="{{error}}" class="card">{{error}}</view>
   <block wx:if="{{order}}">
+    <view class="card" wx:if="{{order.pickupCode}}">
+      <view class="muted">取件码 · 现场自取</view>
+      <view class="pickup">{{order.pickupCode}}</view>
+      <view class="muted">到店报这个码取打印件</view>
+    </view>
     <view class="card">
       <view class="tag">{{statusText}}</view>
       <view class="h1" style="margin-top: 12rpx;">{{order.orderNo}}</view>
-      <view class="muted">{{order.store.name}}</view>
+      <view class="muted">{{order.store.name}} · 微信自助</view>
       <view wx:if="{{order.remark}}" style="margin-top: 8rpx;">备注：{{order.remark}}</view>
     </view>
     <view class="card" wx:for="{{order.items}}" wx:key="id">

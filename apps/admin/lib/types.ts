@@ -66,6 +66,8 @@ export type PrintJob = {
 export type Order = {
   id: string;
   orderNo: string;
+  pickupCode: string | null;
+  fulfillment: "instore";
   status: string;
   totalAmount: number;
   remark: string;

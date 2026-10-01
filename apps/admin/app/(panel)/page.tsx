@@ -41,11 +41,12 @@ export default function DashboardPage() {
             ) : (
               <table>
                 <thead>
-                  <tr><th>单号</th><th>门店</th><th>金额</th><th>状态</th><th>时间</th></tr>
+                  <tr><th>取件码</th><th>单号</th><th>门店</th><th>金额</th><th>状态</th><th>时间</th></tr>
                 </thead>
                 <tbody>
                   {data.recent.map((order) => (
                     <tr key={order.id}>
+                      <td className="code">{order.pickupCode || "—"}</td>
                       <td><Link href={`/orders/${order.id}`}>{order.orderNo}</Link></td>
                       <td>{order.store.name}</td>
                       <td>{formatMoney(order.totalAmount)}</td>

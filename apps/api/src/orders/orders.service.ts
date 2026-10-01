@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { ColorMode, OrderStatus, PaperSize, Prisma } from "@prisma/client";
 import { makeOrderNo, shanghaiDayStart } from "../common/crypto";
@@ -88,23 +89,32 @@ export class OrdersService {
     if (!existing) throw new NotFoundException("订单不存在");
     if (existing.status === "cancelled") throw new BadRequestException("订单已取消");
     if (existing.status === "pending_payment") {
-      await this.prisma.$transaction(async (tx) => {
-        const updated = await tx.order.updateMany({
-          where: { id: orderId, customerId, status: "pending_payment" },
-          data: { status: "paid", payChannel: "mock", paidAt: new Date() },
-        });
-        if (updated.count !== 1) return;
-        const items = await tx.orderItem.findMany({ where: { orderId } });
-        await tx.printJob.createMany({
-          data: items.map((item) => ({
-            orderId,
-            orderItemId: item.id,
-            storeId: existing.storeId,
-            copies: item.copies,
-            status: "queued" as const,
-          })),
-        });
-      });
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        try {
+          await this.prisma.$transaction(async (tx) => {
+            const pickupCode = await allocatePickupCode(tx, existing.storeId);
+            const updated = await tx.order.updateMany({
+              where: { id: orderId, customerId, status: "pending_payment" },
+              data: { status: "paid", payChannel: "mock", paidAt: new Date(), pickupCode },
+            });
+            if (updated.count !== 1) return;
+            const items = await tx.orderItem.findMany({ where: { orderId } });
+            await tx.printJob.createMany({
+              data: items.map((item) => ({
+                orderId,
+                orderItemId: item.id,
+                storeId: existing.storeId,
+                copies: item.copies,
+                status: "queued" as const,
+              })),
+            });
+          });
+          break;
+        } catch (error) {
+          if (isPrismaUnique(error) && attempt < 7) continue;
+          throw error;
+        }
+      }
     }
     return this.getForCustomer(customerId, orderId);
   }
@@ -140,6 +150,7 @@ export class OrdersService {
     const where: Prisma.OrderWhereInput = {
       store: { merchantId, ...(query.storeId ? { id: query.storeId } : {}) },
       ...(query.status ? { status: query.status } : {}),
+      ...keywordFilter(query.q),
     };
     const [total, rows] = await Promise.all([
       this.prisma.order.count({ where }),
@@ -322,6 +333,26 @@ export class OrdersService {
   }
 }
 
+function keywordFilter(q?: string): Prisma.OrderWhereInput {
+  const keyword = (q ?? "").trim().slice(0, 32);
+  if (!keyword) return {};
+  return {
+    OR: [
+      { orderNo: { contains: keyword, mode: "insensitive" } },
+      { pickupCode: { contains: keyword } },
+    ],
+  };
+}
+
+async function allocatePickupCode(tx: Prisma.TransactionClient, storeId: string) {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const pickupCode = String(randomInt(0, 1_000_000)).padStart(6, "0");
+    const taken = await tx.order.findFirst({ where: { storeId, pickupCode }, select: { id: true } });
+    if (!taken) return pickupCode;
+  }
+  throw new BadRequestException("取件码生成失败，请重试");
+}
+
 function readPage(query: { page?: number | string; pageSize?: number | string }) {
   const page = Number(query.page ?? 1);
   const pageSize = Number(query.pageSize ?? 20);
@@ -355,6 +386,8 @@ function presentOrder(order: OrderRecord) {
   return {
     id: order.id,
     orderNo: order.orderNo,
+    pickupCode: order.pickupCode,
+    fulfillment: "instore",
     status: order.status,
     totalAmount: order.totalAmount,
     remark: order.remark,

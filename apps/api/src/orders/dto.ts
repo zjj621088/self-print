@@ -79,6 +79,11 @@ export class ListOrdersQuery {
   storeId?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(32)
+  q?: string;
+
+  @IsOptional()
   @IsIn(ORDER_STATUSES)
   status?: (typeof ORDER_STATUSES)[number];
 

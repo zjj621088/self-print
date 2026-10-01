@@ -9,6 +9,7 @@ loadEnvFile(path.join(__dirname, "../.env"));
 type Job = {
   id: string;
   orderNo: string;
+  pickupCode?: string | null;
   copies: number;
   duplex: boolean;
   paperSize: string;
@@ -99,11 +100,12 @@ async function processJob(job: Job) {
       colorMode: job.colorMode,
       pageRange: job.pageRange,
       orderNo: job.orderNo,
+      pickupCode: job.pickupCode,
       originalName: job.file.originalName,
     };
     const summary = await printFile(request, printMode, outDir);
     await api(`/agent/jobs/${job.id}/done`, { method: "POST", body: {} });
-    console.log(`已打印 ${job.orderNo} ${summary}`);
+    console.log(`已打印 ${job.orderNo}${job.pickupCode ? ` 取件码 ${job.pickupCode}` : ""} ${summary}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "打印失败";
     await api(`/agent/jobs/${job.id}/fail`, { method: "POST", body: { error: message.slice(0, 200) } }).catch(() => undefined);

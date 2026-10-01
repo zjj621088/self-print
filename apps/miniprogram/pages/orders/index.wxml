@@ -6,6 +6,7 @@
       <text class="tag">{{item.statusText}}</text>
     </view>
     <view style="margin-top: 8rpx;">{{item.names}}</view>
+    <view wx:if="{{item.pickupCode}}" style="margin-top: 8rpx;">取件码 {{item.pickupCode}}</view>
     <view class="row muted" style="margin-top: 8rpx;">
       <text>{{item.time}}</text>
       <text>{{item.amount}}</text>

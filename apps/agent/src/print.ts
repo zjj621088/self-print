@@ -11,6 +11,7 @@ export type PrintRequest = {
   colorMode: string;
   pageRange: string;
   orderNo: string;
+  pickupCode?: string | null;
   originalName: string;
 };
 

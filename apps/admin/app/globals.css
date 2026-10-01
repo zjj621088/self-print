@@ -108,6 +108,7 @@ th { color: var(--muted); font-weight: 500; font-size: 12px; }
 .pill-offline, .pill-pending_payment { background: #efeae1; color: var(--muted); }
 .qr { width: 180px; height: 180px; border-radius: 12px; background: white; }
 .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.08em; }
+.pickup { margin: 8px 0 0; font-size: 28px; letter-spacing: 0.16em; font-weight: 700; }
 .token-box { background: #14241f; color: #d8fff2; padding: 12px; border-radius: 12px; word-break: break-all; }
 .checks { display: flex; gap: 14px; align-items: center; }
 .checks label { margin: 0; display: flex; gap: 6px; align-items: center; color: var(--ink); }

@@ -40,6 +40,8 @@ export default function OrderDetailPage() {
         <div>
           <p className="muted"><Link href="/orders">订单</Link> / {order.store.name}</p>
           <h1>{order.orderNo}</h1>
+          {order.pickupCode && <p className="pickup">取件码 {order.pickupCode}</p>}
+          <p className="muted">微信自助 · 现场自取</p>
         </div>
         <span className={`pill pill-${order.status}`}>{ORDER_STATUS_LABEL[order.status]}</span>
       </div>

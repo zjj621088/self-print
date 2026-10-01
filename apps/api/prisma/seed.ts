@@ -89,6 +89,9 @@ async function main() {
   await writeFile(path.join(uploadDir, "seed-demo-notes.pdf"), DEMO_PDF);
 
   const existingOrder = await prisma.order.findUnique({ where: { orderNo: DEMO_ORDER_NO } });
+  if (existingOrder && !existingOrder.pickupCode) {
+    await prisma.order.update({ where: { id: existingOrder.id }, data: { pickupCode: "102468" } });
+  }
   if (!existingOrder) {
     const file = await prisma.fileAsset.upsert({
       where: { storageKey: "seed-demo-notes.pdf" },
@@ -109,6 +112,7 @@ async function main() {
         customerId: customer.id,
         status: "completed",
         totalAmount: 40,
+        pickupCode: "102468",
         remark: "演示订单",
         payChannel: "mock",
         paidAt: new Date(),

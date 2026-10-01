@@ -157,10 +157,13 @@ describe("self-print flow", () => {
     assert.equal(paid.status, 201, JSON.stringify(paid.data));
     assert.equal(paid.data.status, "paid");
     assert.equal(paid.data.jobs.length, 1);
+    assert.match(paid.data.pickupCode, /^\d{6}$/);
+    assert.equal(paid.data.fulfillment, "instore");
 
     const paidAgain = await api(`/customer/orders/${order.data.id}/mock-pay`, { method: "POST", token: customerToken });
     assert.equal(paidAgain.status, 201);
     assert.equal(paidAgain.data.jobs.length, 1);
+    assert.equal(paidAgain.data.pickupCode, paid.data.pickupCode);
 
     const beat = await api("/agent/heartbeat", {
       method: "POST",
@@ -173,6 +176,7 @@ describe("self-print flow", () => {
     const jobs = await api("/agent/jobs", { token: agentToken });
     assert.equal(jobs.status, 200);
     assert.equal(jobs.data.length, 1);
+    assert.equal(jobs.data[0].pickupCode, paid.data.pickupCode);
     const jobId = jobs.data[0].id as string;
 
     const claimed = await api(`/agent/jobs/${jobId}/claim`, {
@@ -200,6 +204,10 @@ describe("self-print flow", () => {
     assert.equal(listed.status, 200, JSON.stringify(listed.data));
     assert.equal(listed.data.pageSize, 1);
     assert.equal(listed.data.items.length, 1);
+
+    const byCode = await api(`/merchant/orders?q=${paid.data.pickupCode}`, { token: merchantToken });
+    assert.equal(byCode.status, 200, JSON.stringify(byCode.data));
+    assert.equal(byCode.data.items.some((item: { id: string }) => item.id === order.data.id), true);
 
     const merchantView = await api(`/merchant/orders/${order.data.id}`, { token: merchantToken });
     assert.equal(merchantView.data.status, "printed");

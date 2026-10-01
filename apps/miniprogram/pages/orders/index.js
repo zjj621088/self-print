@@ -19,6 +19,7 @@ Page({
           id: order.id,
           store: order.store,
           statusText: STATUS_LABEL[order.status] || order.status,
+          pickupCode: order.pickupCode || "",
           names: (order.items || []).map((item) => item.file.originalName).join("、"),
           time: (order.createdAt || "").replace("T", " ").slice(5, 16),
           amount: fenToYuan(order.totalAmount),

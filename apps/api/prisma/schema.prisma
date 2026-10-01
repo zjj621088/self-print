@@ -138,6 +138,7 @@ model Order {
   status      OrderStatus @default(pending_payment)
   totalAmount Int
   remark      String      @default("")
+  pickupCode  String?
   payChannel  String?
   paidAt      DateTime?
   createdAt   DateTime    @default(now())
@@ -145,6 +146,7 @@ model Order {
   items       OrderItem[]
   jobs        PrintJob[]
 
+  @@unique([storeId, pickupCode])
   @@index([storeId, createdAt])
   @@index([customerId, createdAt])
 }

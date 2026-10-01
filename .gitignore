@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.next/
+uploads/
+printed/
+.env
+.env.local
+*.log
+*.tsbuildinfo
+.DS_Store
+coverage/
+apps/miniprogram/miniprogram_npm/

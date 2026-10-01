@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="card">
+    <view class="row">
+      <button class="ghost" bindtap="chooseFile">从聊天选文件</button>
+      <button class="ghost" bindtap="chooseImage">拍照或相册</button>
+    </view>
+    <view class="muted" style="margin-top: 12rpx;">PDF 和图片可直接打印。Word 等文档需要自己填页数，店里暂时不能自动转换。</view>
+  </view>
+  <view wx:if="{{files.length === 0}}" class="card muted">还没有文件。</view>
+  <view class="card" wx:for="{{files}}" wx:key="fileId">
+    <view class="row">
+      <text>{{item.originalName}}</text>
+      <text class="muted" data-index="{{index}}" bindtap="remove">移除</text>
+    </view>
+    <view class="muted">{{item.printable ? '共 ' + item.pageCount + ' 页' : 'Office 文档，请填写页数'}}</view>
+    <view class="row" style="margin-top: 16rpx;" wx:if="{{!item.printable}}">
+      <text>页数</text>
+      <view class="stepper">
+        <button data-index="{{index}}" data-field="declaredPageCount" data-delta="-1" bindtap="step">-</button>
+        <text>{{item.declaredPageCount}}</text>
+        <button data-index="{{index}}" data-field="declaredPageCount" data-delta="1" bindtap="step">+</button>
+      </view>
+    </view>
+    <view class="row" style="margin-top: 16rpx;">
+      <text>份数</text>
+      <view class="stepper">
+        <button data-index="{{index}}" data-field="copies" data-delta="-1" bindtap="step">-</button>
+        <text>{{item.copies}}</text>
+        <button data-index="{{index}}" data-field="copies" data-delta="1" bindtap="step">+</button>
+      </view>
+    </view>
+    <view class="seg" style="margin-top: 16rpx;">
+      <text class="{{item.colorMode === 'bw' ? 'on' : ''}}" data-index="{{index}}" data-key="colorMode" data-value="bw" bindtap="pick">黑白</text>
+      <text class="{{item.colorMode === 'color' ? 'on' : ''}}" data-index="{{index}}" data-key="colorMode" data-value="color" bindtap="pick">彩色</text>
+      <text class="{{!item.duplex ? 'on' : ''}}" data-index="{{index}}" data-key="duplex" data-value="false" bindtap="pick">单面</text>
+      <text class="{{item.duplex ? 'on' : ''}}" data-index="{{index}}" data-key="duplex" data-value="true" bindtap="pick">双面</text>
+      <text class="{{item.paperSize === 'A4' ? 'on' : ''}}" data-index="{{index}}" data-key="paperSize" data-value="A4" bindtap="pick">A4</text>
+      <text class="{{item.paperSize === 'A3' ? 'on' : ''}}" data-index="{{index}}" data-key="paperSize" data-value="A3" bindtap="pick">A3</text>
+    </view>
+    <input class="input" style="margin-top: 16rpx;" placeholder="页码，默认全部。例如 1-3" data-index="{{index}}" value="{{item.pageRange}}" bindinput="onRange" />
+  </view>
+  <view class="footer">
+    <button class="btn" style="width: 100%;" disabled="{{files.length === 0}}" bindtap="next">去结算</button>
+  </view>
+</view>

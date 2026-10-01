@@ -1,0 +1,21 @@
+<view class="page">
+  <view wx:if="{{error}}" class="card">{{error}}</view>
+  <block wx:if="{{store}}">
+    <view class="card">
+      <view class="h1">{{store.name}}</view>
+      <view class="muted">{{store.address || "店内自助打印"}}</view>
+      <view wx:if="{{store.notice}}" style="margin-top: 12rpx;">{{store.notice}}</view>
+      <view wx:if="{{!anyOnline}}" class="muted" style="margin-top: 12rpx;">打印机当前离线，下单后会在恢复连接后打印。</view>
+    </view>
+    <view class="card">
+      <view class="row"><text>价格</text><text class="muted">元/页</text></view>
+      <view class="row" wx:for="{{prices}}" wx:key="label" style="margin-top: 14rpx;">
+        <text>{{item.label}}</text>
+        <text>{{item.price}}</text>
+      </view>
+    </view>
+    <view class="footer">
+      <button class="btn" style="width: 100%;" bindtap="start">上传文件</button>
+    </view>
+  </block>
+</view>

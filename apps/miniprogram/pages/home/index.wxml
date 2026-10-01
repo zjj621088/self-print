@@ -1,0 +1,14 @@
+<view class="page">
+  <view class="card">
+    <view class="tag">到店扫码</view>
+    <view class="h1" style="margin-top: 16rpx;">把文件传到这家店，付完就印。</view>
+    <view class="muted" style="margin-top: 12rpx;">登录和支付目前是模拟的，不会产生真实扣款。</view>
+  </view>
+  <view class="card">
+    <view class="muted">进店码</view>
+    <input class="input" style="margin-top: 12rpx;" placeholder="例如 DEMO01" value="{{code}}" bindinput="onCode" maxlength="12" />
+    <button class="btn" style="margin-top: 20rpx; width: 100%;" bindtap="enter">进入门店</button>
+    <button class="ghost" style="margin-top: 16rpx; width: 100%;" bindtap="scan">扫描二维码</button>
+  </view>
+  <button class="ghost" style="width: 100%;" bindtap="orders">我的订单</button>
+</view>

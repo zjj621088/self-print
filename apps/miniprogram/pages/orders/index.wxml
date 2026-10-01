@@ -1,0 +1,14 @@
+<view class="page">
+  <view wx:if="{{orders.length === 0}}" class="card muted">还没有订单。</view>
+  <view class="card" wx:for="{{orders}}" wx:key="id" data-id="{{item.id}}" bindtap="open">
+    <view class="row">
+      <text>{{item.store.name}}</text>
+      <text class="tag">{{item.statusText}}</text>
+    </view>
+    <view style="margin-top: 8rpx;">{{item.names}}</view>
+    <view class="row muted" style="margin-top: 8rpx;">
+      <text>{{item.time}}</text>
+      <text>{{item.amount}}</text>
+    </view>
+  </view>
+</view>

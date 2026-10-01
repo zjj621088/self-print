@@ -1,0 +1,57 @@
+page {
+  background: #f3efe6;
+  color: #1c1915;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+button { margin: 0; padding: 0 28rpx; }
+button::after { border: none; }
+.page { padding: 24rpx 24rpx 160rpx; }
+.card {
+  background: #fffdf8;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+.h1 { font-size: 44rpx; font-weight: 650; line-height: 1.25; }
+.muted { color: #6f675c; font-size: 24rpx; }
+.btn, .ghost {
+  border-radius: 999rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.btn { background: #0f6e56; color: #fff; }
+.ghost { background: transparent; color: #0f6e56; border: 2rpx solid #0f6e56; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
+.tag {
+  display: inline-block;
+  background: #e7f5f0;
+  color: #0f6e56;
+  border-radius: 999rpx;
+  padding: 4rpx 14rpx;
+  font-size: 22rpx;
+}
+.footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  padding: 20rpx 24rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: rgba(243, 239, 230, 0.96);
+}
+.input {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 18rpx 20rpx;
+  border: 1rpx solid #e4dccf;
+}
+.seg { display: flex; gap: 12rpx; flex-wrap: wrap; }
+.seg text, .stepper button {
+  background: #fff;
+  border: 1rpx solid #e4dccf;
+  border-radius: 999rpx;
+  padding: 8rpx 18rpx;
+}
+.seg text.on { background: #1c1915; color: #fff; border-color: #1c1915; }
+.stepper { display: flex; align-items: center; gap: 16rpx; }
+.stepper button { width: 56rpx; height: 56rpx; line-height: 52rpx; text-align: center; padding: 0; }

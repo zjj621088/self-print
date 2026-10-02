@@ -142,6 +142,33 @@ describe("self-print flow", () => {
     assert.equal(quote.status, 201, JSON.stringify(quote.data));
     assert.equal(quote.data.totalAmount, 80);
 
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "base64",
+    );
+    const album = await api("/customer/album-sessions", { method: "POST", token: customerToken, body: { room: 30 } });
+    assert.equal(album.status, 201, JSON.stringify(album.data));
+    const albumForm = new FormData();
+    albumForm.append("file", new Blob([png], { type: "image/png" }), "photo.png");
+    const albumUpload = await fetch(`${base}/public/album/${album.data.token}/files`, { method: "POST", body: albumForm });
+    assert.equal(albumUpload.status, 201, await albumUpload.text());
+    const albumFiles = await api(`/customer/album-sessions/${album.data.token}`, { token: customerToken });
+    assert.equal(albumFiles.status, 200, JSON.stringify(albumFiles.data));
+    assert.equal(albumFiles.data.files.length, 1);
+    assert.equal(albumFiles.data.files[0].originalName, "photo.png");
+    fileIds.push(albumFiles.data.files[0].id);
+    const albumPage = await fetch(`${base}/public/album/${album.data.token}`);
+    const albumHtml = await albumPage.text();
+    assert.equal(albumPage.status, 200);
+    assert.match(albumHtml, /一次最多选择 30 张/);
+
+    const tooMany = await api("/customer/orders/quote", {
+      method: "POST",
+      token: customerToken,
+      body: { ...draft, items: Array.from({ length: 31 }, () => draft.items[0]) },
+    });
+    assert.equal(tooMany.status, 400);
+
     const badRange = await api("/customer/orders/quote", {
       method: "POST",
       token: customerToken,

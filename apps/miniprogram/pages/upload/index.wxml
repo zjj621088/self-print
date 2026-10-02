@@ -4,7 +4,7 @@
       <button class="ghost" bindtap="chooseFile">从聊天选文件</button>
       <button class="ghost" bindtap="chooseImage">拍照或相册</button>
     </view>
-    <view class="muted" style="margin-top: 12rpx;">PDF 和图片可直接打印。Word 等文档需要自己填页数，店里暂时不能自动转换。</view>
+    <view class="muted" style="margin-top: 12rpx;">照片走手机系统相册，一次最多 30 张。PDF 可直接打印。Word 等文档需要自己填页数，店里暂时不能自动转换。</view>
   </view>
   <view wx:if="{{files.length === 0}}" class="card muted">还没有文件。</view>
   <view class="card" wx:for="{{files}}" wx:key="fileId">

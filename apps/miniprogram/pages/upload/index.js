@@ -1,5 +1,5 @@
 const { apiBase } = require("../../utils/config");
-const { showError } = require("../../utils/request");
+const { request, showError } = require("../../utils/request");
 const { ensureLogin } = require("../../utils/session");
 
 Page({
@@ -11,6 +11,7 @@ Page({
       return;
     }
     this.storeCode = store.code;
+    this.consumeAlbum();
   },
   chooseFile() {
     wx.chooseMessageFile({
@@ -21,17 +22,19 @@ Page({
     });
   },
   chooseImage() {
-    wx.chooseMedia({
-      count: 9,
-      mediaType: ["image"],
-      success: (res) => {
-        const files = (res.tempFiles || []).map((file, index) => ({
-          path: file.tempFilePath,
-          name: "图片" + (this.data.files.length + index + 1) + ".jpg",
-        }));
-        this.uploadList(files);
-      },
-    });
+    const room = 30 - this.data.files.length;
+    if (room <= 0) {
+      wx.showModal({ title: "提示", content: "一单最多 30 张照片", showCancel: false });
+      return;
+    }
+    const self = this;
+    ensureLogin()
+      .then(() => request({ url: "/customer/album-sessions", method: "POST", data: { room } }))
+      .then((session) => {
+        self.pendingAlbumToken = session.token;
+        wx.navigateTo({ url: "/pages/album/index?token=" + session.token });
+      })
+      .catch(showError);
   },
   uploadList(tempFiles) {
     const self = this;
@@ -93,6 +96,29 @@ Page({
     const files = this.data.files.slice();
     files.splice(index, 1);
     this.setData({ files });
+  },
+  consumeAlbum() {
+    const token = this.pendingAlbumToken;
+    if (!token) return;
+    this.pendingAlbumToken = "";
+    const self = this;
+    request({ url: "/customer/album-sessions/" + token }).then((result) => {
+      const existing = {};
+      self.data.files.forEach((item) => { existing[item.fileId] = true; });
+      const added = (result.files || []).filter((file) => !existing[file.id]).map((file) => ({
+        fileId: file.id,
+        originalName: file.originalName,
+        pageCount: file.pageCount,
+        printable: file.printable,
+        declaredPageCount: file.pageCount,
+        copies: 1,
+        colorMode: "color",
+        duplex: false,
+        paperSize: "A4",
+        pageRange: "",
+      }));
+      if (added.length) self.setData({ files: self.data.files.concat(added) });
+    }).catch(showError);
   },
   next() {
     if (!this.data.files.length) return;

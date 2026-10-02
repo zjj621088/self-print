@@ -13,6 +13,7 @@ import {
   Min,
   ValidateNested,
 } from "class-validator";
+import { MAX_ORDER_ITEMS } from "../common/limits";
 import { COLOR_MODES, PAPER_SIZES } from "../pricing/pricing";
 
 const ORDER_STATUSES = [
@@ -62,7 +63,7 @@ export class OrderDraftDto {
 
   @IsArray()
   @ArrayMinSize(1)
-  @ArrayMaxSize(10)
+  @ArrayMaxSize(MAX_ORDER_ITEMS)
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items!: OrderItemDto[];

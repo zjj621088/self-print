@@ -3,6 +3,7 @@
     "pages/home/index",
     "pages/store/index",
     "pages/upload/index",
+    "pages/album/index",
     "pages/confirm/index",
     "pages/orders/index",
     "pages/order/index"

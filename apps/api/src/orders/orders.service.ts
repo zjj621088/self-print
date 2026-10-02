@@ -2,6 +2,7 @@ import { randomInt } from "node:crypto";
 import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { ColorMode, OrderStatus, PaperSize, Prisma } from "@prisma/client";
 import { makeOrderNo, shanghaiDayStart } from "../common/crypto";
+import { MAX_ORDER_ITEMS } from "../common/limits";
 import { isPrismaUnique } from "../common/http";
 import { isDirectPrintable } from "../pricing/pages";
 import { PricingError, quoteItem, resolveBillingPageCount } from "../pricing/pricing";
@@ -279,6 +280,9 @@ export class OrdersService {
   }
 
   private async prepare(customerId: string, dto: OrderDraftDto) {
+    if (!Array.isArray(dto.items) || dto.items.length < 1 || dto.items.length > MAX_ORDER_ITEMS) {
+      throw new BadRequestException(`一单最多 ${MAX_ORDER_ITEMS} 个文件`);
+    }
     const store = await this.prisma.store.findUnique({
       where: { code: dto.storeCode.trim().toUpperCase() },
       include: { priceRules: true },

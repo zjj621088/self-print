@@ -111,8 +111,20 @@ model Customer {
   nickname  String      @default("微信用户")
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  files     FileAsset[]
-  orders    Order[]
+  files         FileAsset[]
+  orders        Order[]
+  albumSessions AlbumSession[]
+}
+
+model AlbumSession {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  room       Int
+  fileIds    String[] @default([])
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
 }
 
 model FileAsset {

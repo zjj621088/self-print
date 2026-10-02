@@ -1,0 +1,18 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "self-print",
+  "description": "自助打印顾客端",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": false,
+    "compileWorklet": false
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.5.5",
+  "condition": {},
+  "packOptions": { "ignore": [], "include": [] }
+}

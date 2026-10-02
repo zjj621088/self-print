@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/store/index",
+    "pages/upload/index",
+    "pages/album/index",
+    "pages/confirm/index",
+    "pages/orders/index",
+    "pages/order/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "自助打印",
+    "navigationBarBackgroundColor": "#1c1915",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f3efe6"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

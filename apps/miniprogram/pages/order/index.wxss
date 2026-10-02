@@ -1,0 +1,6 @@
+.pickup {
+  margin: 8rpx 0;
+  font-size: 72rpx;
+  font-weight: 700;
+  letter-spacing: 10rpx;
+}

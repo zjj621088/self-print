@@ -1,0 +1,25 @@
+<view class="page">
+  <view wx:if="{{error}}" class="card">{{error}}</view>
+  <view class="card" wx:if="{{quote}}">
+    <view class="muted">{{quote.store.name}}</view>
+    <view class="row" wx:for="{{quote.items}}" wx:key="fileId" style="margin-top: 16rpx;">
+      <view>
+        <view>{{item.originalName}}</view>
+        <view class="muted">{{item.spec}} · {{item.copies}} 份 · {{item.pageCount}} 页</view>
+      </view>
+      <text>{{item.amountText}}</text>
+    </view>
+    <view class="row" style="margin-top: 20rpx;">
+      <text>合计</text>
+      <text class="h1" style="font-size: 40rpx;">{{total}}</text>
+    </view>
+  </view>
+  <view class="card">
+    <view class="muted">备注</view>
+    <input class="input" style="margin-top: 12rpx;" placeholder="选填，例如 课间来取" value="{{remark}}" bindinput="onRemark" maxlength="200" />
+    <view class="muted" style="margin-top: 12rpx;">当前是模拟支付，点击后订单会直接进入待打印。</view>
+  </view>
+  <view class="footer">
+    <button class="btn" style="width: 100%;" disabled="{{paying || !quote}}" bindtap="pay">{{paying ? '支付中…' : '模拟支付 ' + total}}</button>
+  </view>
+</view>

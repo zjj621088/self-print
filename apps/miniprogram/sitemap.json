@@ -1,0 +1,4 @@
+{
+  "desc": "self-print",
+  "rules": [{ "action": "allow", "page": "*" }]
+}

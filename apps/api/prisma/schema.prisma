@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StoreStatus {
+  active
+  inactive
+}
+
+enum PrinterStatus {
+  online
+  offline
+  busy
+  error
+}
+
+enum ColorMode {
+  bw
+  color
+}
+
+enum PaperSize {
+  A4
+  A3
+}
+
+enum OrderStatus {
+  pending_payment
+  paid
+  printing
+  printed
+  completed
+  cancelled
+  failed
+}
+
+enum JobStatus {
+  queued
+  claimed
+  printing
+  done
+  failed
+}
+
+model Merchant {
+  id           String   @id @default(cuid())
+  name         String
+  phone        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  stores       Store[]
+}
+
+model Store {
+  id          String       @id @default(cuid())
+  merchantId  String
+  merchant    Merchant     @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  name        String
+  code        String       @unique
+  address     String       @default("")
+  phone       String       @default("")
+  notice      String       @default("")
+  status      StoreStatus  @default(active)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  printers    Printer[]
+  priceRules  PriceRule[]
+  orders      Order[]
+  agentTokens AgentToken[]
+}
+
+model Printer {
+  id              String        @id @default(cuid())
+  storeId         String
+  store           Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name            String
+  systemName      String
+  status          PrinterStatus @default(offline)
+  supportsColor   Boolean       @default(true)
+  supportsDuplex  Boolean       @default(true)
+  paperSizes      String        @default("A4,A3")
+  lastHeartbeatAt DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  jobs            PrintJob[]
+
+  @@unique([storeId, name])
+}
+
+model PriceRule {
+  id           String    @id @default(cuid())
+  storeId      String
+  store        Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  paperSize    PaperSize
+  colorMode    ColorMode
+  duplex       Boolean
+  pricePerPage Int
+
+  @@unique([storeId, paperSize, colorMode, duplex])
+}
+
+model Customer {
+  id        String      @id @default(cuid())
+  openId    String      @unique
+  nickname  String      @default("微信用户")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  files         FileAsset[]
+  orders        Order[]
+  albumSessions AlbumSession[]
+}
+
+model AlbumSession {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  room       Int
+  fileIds    String[] @default([])
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+model FileAsset {
+  id           String      @id @default(cuid())
+  customerId   String
+  customer     Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  originalName String
+  mimeType     String
+  size         Int
+  storageKey   String      @unique
+  pageCount    Int
+  createdAt    DateTime    @default(now())
+  items        OrderItem[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNo     String      @unique
+  storeId     String
+  store       Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customerId  String
+  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  status      OrderStatus @default(pending_payment)
+  totalAmount Int
+  remark      String      @default("")
+  pickupCode  String?
+  payChannel  String?
+  paidAt      DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
+  jobs        PrintJob[]
+
+  @@unique([storeId, pickupCode])
+  @@index([storeId, createdAt])
+  @@index([customerId, createdAt])
+}
+
+model OrderItem {
+  id        String    @id @default(cuid())
+  orderId   String
+  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fileId    String
+  file      FileAsset @relation(fields: [fileId], references: [id])
+  copies    Int
+  colorMode ColorMode
+  duplex    Boolean
+  paperSize PaperSize
+  pageRange String
+  pageCount Int
+  unitPrice Int
+  amount    Int
+  jobs      PrintJob[]
+}
+
+model PrintJob {
+  id          String    @id @default(cuid())
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderItemId String
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  storeId     String
+  printerId   String?
+  printer     Printer?  @relation(fields: [printerId], references: [id], onDelete: SetNull)
+  status      JobStatus @default(queued)
+  copies      Int
+  error       String    @default("")
+  claimedAt   DateTime?
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([storeId, status])
+}
+
+model AgentToken {
+  id         String    @id @default(cuid())
+  storeId    String
+  store      Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name       String
+  tokenHash  String    @unique
+  tokenHint  String
+  revokedAt  DateTime?
+  lastSeenAt DateTime?
+  createdAt  DateTime  @default(now())
+}

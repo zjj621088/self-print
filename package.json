@@ -1,0 +1,24 @@
+{
+  "name": "self-print",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/admin",
+    "apps/agent"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,admin -c blue,green \"npm run dev -w @selfprint/api\" \"npm run dev -w @selfprint/admin\"",
+    "dev:agent": "npm run dev -w @selfprint/agent",
+    "build": "npm run build -w @selfprint/api && npm run build -w @selfprint/admin",
+    "test": "npm run test -w @selfprint/api && npm run test -w @selfprint/agent",
+    "db:deploy": "npm run db:deploy -w @selfprint/api",
+    "db:seed": "npm run db:seed -w @selfprint/api",
+    "db:setup": "npm run db:deploy -w @selfprint/api && npm run db:seed -w @selfprint/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
